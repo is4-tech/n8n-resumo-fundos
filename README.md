@@ -37,4 +37,8 @@ A chave de API nunca fica dentro do arquivo do fluxo.
 
 - Ler os dados de uma planilha (Google Sheets)
 - Enviar o resumo por e-mail ou Telegram
-- Agendar
+- Agendar a execução diária
+
+## Ferramentas
+
+n8n · Gemini API · JavaScript · Prompt engineering
