@@ -21,8 +21,8 @@ O prompt define o papel (analista de tesouraria), o formato (até 5 linhas, em p
 
 ## Resultado
 
-![Fluxo no n8n](fluxo-n8n.png)
-![Resumo gerado pela IA](resultado-resumo.png)
+![Fluxo no n8n](IMG_3819.png)
+![Resumo gerado pela IA](IMG_3820.png)
 
 ## Como rodar
 
@@ -37,8 +37,4 @@ A chave de API nunca fica dentro do arquivo do fluxo.
 
 - Ler os dados de uma planilha (Google Sheets)
 - Enviar o resumo por e-mail ou Telegram
-- Agendar a execução diária
-
-## Ferramentas
-
-n8n · Gemini API · JavaScript · Prompt engineering
+- Agendar
