@@ -1,0 +1,110 @@
+{
+  "name": "Resumo diário de fundos com IA (Gemini)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "n1",
+      "name": "Iniciar manualmente",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Dados 100% FICTÍCIOS de fundos (não use dados reais da empresa)\nconst CDI = 0.0551; // % ao dia útil, ilustrativo\nconst base = [\n  { nome: \"Fundo Renda DI\", cotaOntem: 10.512340, varPct: 0.0560 },\n  { nome: \"Fundo Crédito Privado\", cotaOntem: 10.298100, varPct: 0.0490 },\n  { nome: \"Fundo Multimercado\", cotaOntem: 9.874500, varPct: 0.0890 }\n];\n\nconst fundos = base.map(f => {\n  const cotaHoje = +(f.cotaOntem * (1 + f.varPct / 100)).toFixed(6);\n  const pctCDI = +((f.varPct / CDI) * 100).toFixed(1);\n  return { fundo: f.nome, cotaOntem: f.cotaOntem, cotaHoje, variacaoDiaPct: f.varPct, pctDoCDI: pctCDI };\n});\n\nconst prompt = `Você é analista de tesouraria. Com os dados fictícios abaixo, escreva um resumo diário em português, com no máximo 5 linhas, para um gestor financeiro.\nDestaque o melhor e o pior fundo em % do CDI e avise se algum ficou abaixo de 100% do CDI. Use apenas os números fornecidos, sem inventar nada.\n\nCDI do dia: ${CDI}%\nDados: ${JSON.stringify(fundos)}`;\n\nreturn [{ json: { fundos, prompt } }];"
+      },
+      "id": "n2",
+      "name": "Dados fictícios dos fundos",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ contents: [ { parts: [ { text: $json.prompt } ] } ] }) }}",
+        "options": {}
+      },
+      "id": "n3",
+      "name": "Pedir resumo ao Gemini",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "resumo",
+              "value": "={{ $json.candidates[0].content.parts[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "n4",
+      "name": "Resumo final",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        720,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Iniciar manualmente": {
+      "main": [
+        [
+          {
+            "node": "Dados fictícios dos fundos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dados fictícios dos fundos": {
+      "main": [
+        [
+          {
+            "node": "Pedir resumo ao Gemini",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pedir resumo ao Gemini": {
+      "main": [
+        [
+          {
+            "node": "Resumo final",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
